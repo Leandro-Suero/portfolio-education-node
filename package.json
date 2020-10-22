@@ -1,0 +1,43 @@
+{
+  "name": "portfolio-education-node",
+  "version": "1.0.0",
+  "description": "A REST API with authentication and authorization for managing an education institute's groups, events and staff",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "nodemon src/index.js --exec babel-node",
+    "build": "babel src --out-dir build",
+    "start": "node build/index.js",
+    "test": "jest"
+  },
+  "keywords": [
+    "NodeJS",
+    "PostgreSQL",
+    "Sequelice",
+    "Babel",
+    "JWT",
+    "API"
+  ],
+  "author": "Leandro Suero",
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/cli": "^7.11.5",
+    "@babel/core": "^7.11.5",
+    "@babel/node": "^7.10.5",
+    "@babel/preset-env": "^7.11.5",
+    "jest": "^26.4.2",
+    "nodemon": "^2.0.4"
+  },
+  "dependencies": {
+    "@babel/polyfill": "^7.12.1",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "helmet": "^4.1.0",
+    "jsonwebtoken": "^8.5.1",
+    "morgan": "^1.10.0",
+    "pg": "^8.4.1",
+    "pg-hstore": "^2.3.3",
+    "sequelize": "^6.3.5"
+  }
+}
