@@ -2,10 +2,21 @@ import User from "../models/User";
 
 export const createUser = async (req, res) => {
   try {
-    const { name, email, password, rol, can_login, phone, active } = req.body;
+    const {
+      name,
+      email,
+      password = null,
+      rol,
+      can_login = false,
+      phone = null,
+      active = true,
+    } = req.body;
     //if unique email can be tested before to give an acording message
     //in this case returning always a generic 500
-    const hashedPassword = await User.encryptPassword(password);
+    let hashedPassword = null;
+    if (password !== null) {
+      hashedPassword = await User.encryptPassword(password);
+    }
     const savedUser = await User.create(
       {
         name,
