@@ -26,4 +26,16 @@ router.delete(
   eventsCtrl.deleteEventById
 );
 
+//participants routes
+router.post(
+  "/:eventId/participants",
+  [authJwt.verifyToken, authJwt.isAdminOrTeacher],
+  eventsCtrl.addParticipant
+);
+router.delete(
+  "/:eventId/participants",
+  [authJwt.verifyToken, authJwt.isAdminOrTeacher],
+  eventsCtrl.removeParticipant
+);
+
 export default router;

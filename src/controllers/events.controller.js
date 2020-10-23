@@ -1,8 +1,15 @@
 import Event from "../models/Event";
+import User from "../models/User";
+import EventUser from "../models/EventUser";
 
 export async function getEvents(req, res) {
   try {
-    const events = await Event.findAll();
+    const events = await Event.findAll({
+      include: {
+        model: User,
+        attributes: ["name", "id", "email", "role", "active"],
+      },
+    });
     return res.json({
       data: events,
     });
@@ -42,7 +49,13 @@ export async function createEvent(req, res) {
 export async function getEventById(req, res) {
   const { eventId } = req.params;
   try {
-    const event = await Event.findByPk(eventId);
+    const event = await Event.findOne({
+      where: { id: eventId },
+      include: {
+        model: User,
+        attributes: ["name", "id", "email", "role", "active"],
+      },
+    });
     return res.json({
       data: event,
     });
@@ -82,6 +95,48 @@ export async function deleteEventById(req, res) {
       return res.status(404).json({ message: "Event not found", data: {} });
     }
     return res.status(500).json({ message: "Something went wrong", data: {} });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Something went wrong", data: {} });
+  }
+}
+
+//OTHER ROUTES - PARTICIPANTS
+export async function addParticipant(req, res) {
+  const event_id = req.params.eventId;
+  const { user_id } = req.body;
+  try {
+    const newEventUser = await EventUser.create({
+      event_id,
+      user_id,
+    });
+
+    if (newEventUser) {
+      return res.json({
+        message: "User added to this Event succesfully",
+        data: newEventUser,
+      });
+    }
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Something went wrong", data: {} });
+  }
+}
+
+export async function removeParticipant(req, res) {
+  const event_id = req.params.eventId;
+  const { user_id } = req.body;
+  try {
+    const deleted = await EventUser.destroy({
+      where: {
+        event_id,
+        user_id,
+      },
+    });
+
+    if (deleted) {
+      return res.status(204).json();
+    }
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Something went wrong", data: {} });

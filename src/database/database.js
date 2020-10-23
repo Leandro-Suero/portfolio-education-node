@@ -11,6 +11,9 @@ const sequelizeOptions = {
   },
   logging: false, //remove this to get feedback
   timezone: process.env.DB_TIMEZONE,
+  define: {
+    timestamps: false,
+  },
 };
 
 let sequelize = {};

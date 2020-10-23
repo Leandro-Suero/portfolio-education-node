@@ -1,5 +1,7 @@
 import Sequelize from "sequelize";
 import { sequelize } from "../database/database";
+import User from "../models/User";
+import EventUser from "../models/EventUser";
 
 const Event = sequelize.define(
   "events",
@@ -29,5 +31,8 @@ const Event = sequelize.define(
     underscored: true,
   }
 );
+
+Event.belongsToMany(User, { through: EventUser, foreignKey: "event_id" });
+User.belongsToMany(Event, { through: EventUser, foreignKey: "user_id" });
 
 export default Event;
