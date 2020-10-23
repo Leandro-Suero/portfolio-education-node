@@ -16,8 +16,8 @@ const User = sequelize.define(
       type: Sequelize.STRING,
       unique: true,
     },
-    rol: {
-      type: Sequelize.STRING,
+    role: {
+      type: Sequelize.ENUM("admin", "teacher", "student"),
     },
     can_login: {
       type: Sequelize.BOOLEAN,

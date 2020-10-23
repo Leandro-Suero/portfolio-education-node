@@ -11,7 +11,7 @@ export const createAdmin = async () => {
         {
           name: "admin",
           email: "admin@admin",
-          rol: "admin",
+          role: "admin",
           can_login: true,
           password: hashedPassword,
           phone: null,
@@ -21,7 +21,7 @@ export const createAdmin = async () => {
           fields: [
             "name",
             "email",
-            "rol",
+            "role",
             "can_login",
             "password",
             "phone",

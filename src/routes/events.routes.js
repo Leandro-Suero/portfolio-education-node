@@ -1,3 +1,4 @@
+import { authJwt } from "../middlewares";
 import { Router } from "express";
 const router = Router();
 
@@ -7,10 +8,22 @@ router.get("/", eventsCtrl.getEvents);
 
 router.get("/:eventId", eventsCtrl.getEventById);
 
-router.post("/", eventsCtrl.createEvent);
+router.post(
+  "/",
+  [authJwt.verifyToken, authJwt.isAdmin],
+  eventsCtrl.createEvent
+);
 
-router.put("/:eventId", eventsCtrl.updateEventById);
+router.put(
+  "/:eventId",
+  [authJwt.verifyToken, authJwt.isAdminOrTeacher],
+  eventsCtrl.updateEventById
+);
 
-router.delete("/:eventId", eventsCtrl.deleteEventById);
+router.delete(
+  "/:eventId",
+  [authJwt.verifyToken, authJwt.isAdmin],
+  eventsCtrl.deleteEventById
+);
 
 export default router;

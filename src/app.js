@@ -7,7 +7,7 @@ import pkg from "../package.json";
 
 import eventsRoutes from "./routes/events.routes";
 import usersRoutes from "./routes/user.routes";
-//import authRoutes from "./routes/auth.routes";
+import authRoutes from "./routes/auth.routes";
 
 import { createAdmin } from "./libs/initialSetup";
 
@@ -43,6 +43,6 @@ app.get("/", (req, res) => {
 // Routes
 app.use("/events", eventsRoutes);
 app.use("/users", usersRoutes);
-//app.use("/auth", authRoutes);
+app.use("/auth", authRoutes);
 
 export default app;
