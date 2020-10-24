@@ -9,6 +9,7 @@ import authRoutes from "./routes/auth.routes";
 import usersRoutes from "./routes/user.routes";
 import invoicesRoutes from "./routes/invoices.routes";
 import eventsRoutes from "./routes/events.routes";
+import groupsRoutes from "./routes/groups.routes";
 
 import { createAdmin } from "./libs/initialSetup";
 
@@ -46,5 +47,6 @@ app.use("/auth", authRoutes);
 app.use("/users", usersRoutes);
 app.use("/invoices", invoicesRoutes);
 app.use("/events", eventsRoutes);
+app.use("/groups", groupsRoutes);
 
 export default app;
