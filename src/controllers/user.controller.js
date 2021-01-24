@@ -52,10 +52,22 @@ export const createUser = async (req, res) => {
 };
 
 export const getUsers = async (req, res) => {
+  const sort = req.query.sort ? JSON.parse(req.query.sort) : ["id", "ASC"];
+  const offset = req.query.offset ? parseInt(req.query.offset) : 0;
+  const limit = req.query.limit ? parseInt(req.query.limit) : 10;
   try {
-    const users = await User.findAll();
+    const users = await User.findAndCountAll({
+      limit,
+      offset,
+      order: [sort],
+    });
+    res.header(
+      "Content-Range",
+      `users ${offset}-${offset + limit}/${users.count}`
+    );
+    res.header("Access-Control-Expose-Headers", "Content-Range");
     return res.json({
-      data: users,
+      data: users.rows,
     });
   } catch (error) {
     console.error(error);

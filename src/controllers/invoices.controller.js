@@ -2,15 +2,27 @@ import Invoice from "../models/Invoice";
 import User from "../models/User";
 
 export async function getInvoices(req, res) {
+  const sort = req.query.sort ? JSON.parse(req.query.sort) : ["id", "ASC"];
+  const offset = req.query.offset ? parseInt(req.query.offset) : 0;
+  const limit = req.query.limit ? parseInt(req.query.limit) : 10;
   try {
-    const invoices = await Invoice.findAll({
+    const invoices = await Invoice.findAndCountAll({
       include: {
         model: User,
         attributes: ["name", "id", "email", "role", "active"],
       },
+      limit,
+      offset,
+      order: [sort],
     });
+    res.header(
+      "Content-Range",
+      `invoices ${offset}-${offset + limit}/${invoices.count}`
+    );
+    res.header("Access-Control-Expose-Headers", "Content-Range");
     return res.json({
-      data: invoices,
+      data: invoices.rows,
+      total: invoices.count,
     });
   } catch (error) {
     console.error(error);
