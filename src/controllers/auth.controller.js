@@ -18,9 +18,17 @@ export const login = async (req, res) => {
         message: "Invalid Password",
       });
 
-    const token = jwt.sign({ id: userFound.id }, process.env.JWT_SECRET, {
-      expiresIn: 86400, // 24 hours
-    });
+    const token = jwt.sign(
+      {
+        id: userFound.id,
+        permissions: userFound.role,
+        fullName: userFound.name,
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: 86400, // 24 hours
+      }
+    );
 
     res.json({ token });
   } catch (error) {

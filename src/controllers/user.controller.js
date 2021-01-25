@@ -68,6 +68,7 @@ export const getUsers = async (req, res) => {
     res.header("Access-Control-Expose-Headers", "Content-Range");
     return res.json({
       data: users.rows,
+      total: users.count,
     });
   } catch (error) {
     console.error(error);
