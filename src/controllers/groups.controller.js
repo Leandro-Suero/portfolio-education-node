@@ -1,21 +1,11 @@
-import Group from "../models/Group";
-import User from "../models/User";
-import GroupUser from "../models/GroupUser";
+import * as groupService from "../services/groups.services";
 
 export async function getGroups(req, res) {
   const sort = req.query.sort ? JSON.parse(req.query.sort) : ["id", "ASC"];
   const offset = req.query.offset ? parseInt(req.query.offset) : 0;
   const limit = req.query.limit ? parseInt(req.query.limit) : 10;
   try {
-    const groups = await Group.findAndCountAll({
-      include: {
-        model: User,
-        attributes: ["name", "id", "email", "role", "active"],
-      },
-      limit,
-      offset,
-      order: [sort],
-    });
+    const groups = await groupService.getGroups(limit, offset, sort);
     res.header(
       "Content-Range",
       `groups ${offset}-${offset + limit}/${groups.count}`
@@ -32,19 +22,8 @@ export async function getGroups(req, res) {
 }
 
 export async function createGroup(req, res) {
-  console.log("create");
-  const { name, description, active } = req.body;
   try {
-    const newGroup = await Group.create(
-      {
-        name,
-        description,
-        active,
-      },
-      {
-        fields: ["name", "description", "active"],
-      }
-    );
+    const newGroup = await groupService.createGroup(req.body);
     if (newGroup) {
       return res.json({
         message: "Group created succesfully",
@@ -58,15 +37,8 @@ export async function createGroup(req, res) {
 }
 
 export async function getGroupById(req, res) {
-  const { groupId } = req.params;
   try {
-    const group = await Group.findOne({
-      where: { id: groupId },
-      include: {
-        model: User,
-        attributes: ["name", "id", "email", "role", "active"],
-      },
-    });
+    const group = await groupService.getGroupById(req.params.groupId);
     return res.json({
       data: group,
     });
@@ -78,11 +50,7 @@ export async function getGroupById(req, res) {
 
 export async function updateGroupById(req, res) {
   try {
-    const groupFound = await Group.findByPk(req.params.groupId);
-    for (const prop in req.body) {
-      groupFound[prop] = req.body[prop];
-    }
-    const updated = await groupFound.save();
+    const updated = await groupService.updateGroupById(req.body);
     if (updated) {
       return res.status(200).json(updated);
     }
@@ -94,18 +62,12 @@ export async function updateGroupById(req, res) {
 }
 
 export async function deleteGroupById(req, res) {
-  const { groupId } = req.params;
   try {
-    const groupFound = await Group.findByPk(groupId);
-    if (groupFound) {
-      const destroyed = await groupFound.destroy();
-      if (destroyed) {
-        return res.status(204).json();
-      }
-    } else {
-      return res.status(404).json({ message: "Group not found", data: {} });
+    const destroyed = await groupService.deleteGroupById(req.params.groupId);
+    if (destroyed) {
+      return res.status(204).json({ message: "Group deleted!", data: {} });
     }
-    return res.status(500).json({ message: "Something went wrong", data: {} });
+    return res.status(404).json({ message: "Group not found", data: {} });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Something went wrong", data: {} });
@@ -114,15 +76,8 @@ export async function deleteGroupById(req, res) {
 
 //OTHER ROUTES - PARTICIPANTS
 export async function getParticipants(req, res) {
-  const group_id = req.params.groupId;
   try {
-    const group = await Group.findOne({
-      where: { id: group_id },
-      include: {
-        model: User,
-        attributes: ["name", "id", "email", "role", "active"],
-      },
-    });
+    const group = await groupService.getGroupParticipants(req.params.groupId);
     return res.json({
       data: group,
     });
@@ -133,21 +88,12 @@ export async function getParticipants(req, res) {
 }
 
 export async function getParticipantsWithRole(req, res) {
-  const group_id = req.params.groupId;
-  const group_role = req.params.groupRole;
+  const { groupId, groupRole } = req.params;
   try {
-    const group = await Group.findOne({
-      where: { id: group_id },
-      include: {
-        model: User,
-        attributes: ["name", "id", "email", "role", "active"],
-        through: {
-          where: {
-            group_role: group_role,
-          },
-        },
-      },
-    });
+    const group = await groupService.getGroupParticipantsWithRole(
+      groupId,
+      groupRole
+    );
     return res.json({
       data: group,
     });
@@ -159,15 +105,13 @@ export async function getParticipantsWithRole(req, res) {
 
 export async function addParticipant(req, res) {
   const group_id = req.params.groupId;
-  const { user_id } = req.body;
-  const { group_role } = req.body;
+  const { user_id, group_role } = req.body;
   try {
-    const newGroupUser = await GroupUser.create({
+    const newGroupUser = await groupService.addParticipant(
       group_id,
       user_id,
-      group_role,
-    });
-
+      group_role
+    );
     if (newGroupUser) {
       return res.json({
         message: "User added to this Group succesfully",
@@ -184,13 +128,7 @@ export async function removeParticipant(req, res) {
   const group_id = req.params.groupId;
   const { user_id } = req.body;
   try {
-    const deleted = await GroupUser.destroy({
-      where: {
-        group_id,
-        user_id,
-      },
-    });
-
+    const deleted = await groupService.removeParticipant(group_id, user_id);
     if (deleted) {
       return res.status(204).json();
     } else {
